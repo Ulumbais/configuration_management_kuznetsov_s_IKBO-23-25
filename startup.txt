@@ -1,0 +1,6 @@
+ls 
+cd docs
+unknown
+ls docs extra 
+exit extra
+ls again
