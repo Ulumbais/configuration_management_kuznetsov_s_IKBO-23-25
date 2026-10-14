@@ -174,3 +174,24 @@ history не принимает аргументы.
 python -m src.main --vfs examples/deep.csv --script examples/stage4.txt
 python -m unittest discover -s tests -v
 ```
+## Этап 5. Удаление
+
+- rm путь: удаление одного файла;
+- rmdir путь: удаление одной пустой папки.
+
+Обе команды требуют ровно один аргумент.
+Флаги и рекурсивное удаление не поддерживаются.
+Нельзя удалить корень VFS или текущую папку.
+Ошибочные команды не прерывают работу эмулятора.
+
+Функции command_rm и command_rmdir находятся в src.commands.
+Они удаляют записи только из словаря в памяти.
+Исходный CSV не изменяется.
+При повторном запуске исходные файлы и папки восстанавливаются.
+
+Проверка:
+
+```powershell
+python -m src.main --vfs examples/deep.csv --script examples/stage5.txt
+python -m unittest discover -s tests -v
+```
