@@ -11,6 +11,8 @@ from src.commands import (
     command_du,
     command_history,
     command_ls,
+    command_rm,
+    command_rmdir
 )
 
 COMMANDS = {
@@ -18,6 +20,8 @@ COMMANDS = {
     "cd": command_cd,
     "history": command_history,
     "du": command_du,
+    "rm": command_rm,
+    "rmdir": command_rmdir,
 }
 
 def parse_command(text):

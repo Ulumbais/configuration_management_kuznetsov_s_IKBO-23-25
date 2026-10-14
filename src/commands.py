@@ -94,3 +94,35 @@ def command_du(args, state):
                 print(f"{subtree_size(nodes, child)}\t{child}")
 
     print(f"{subtree_size(nodes, path)}\t{path}")
+
+def command_rm(args, state):
+    """Удаляет один файл только из памяти."""
+    if len(args) != 1:
+        raise ValueError("rm требует один путь к файлу")
+
+    path = resolve_path(state, args[0])
+    if state["nodes"][path] is None:
+        raise ValueError(f"Нельзя удалить папку командой rm: {path}")
+
+    del state["nodes"][path]
+
+
+def command_rmdir(args, state):
+    """Удаляет одну пустую папку только из памяти."""
+    if len(args) != 1:
+        raise ValueError("rmdir требует один путь к папке")
+
+    path = resolve_path(state, args[0])
+    nodes = state["nodes"]
+    if nodes[path] is not None:
+        raise ValueError(f"Не является папкой: {path}")
+    if path == "/":
+        raise ValueError("Нельзя удалить корень VFS")
+    if path == state["cwd"]:
+        raise ValueError("Нельзя удалить текущую папку")
+
+    prefix = path + "/"
+    if any(child.startswith(prefix) for child in nodes):
+        raise ValueError(f"Папка не пустая: {path}")
+
+    del nodes[path]

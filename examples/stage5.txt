@@ -1,0 +1,26 @@
+ls
+du /
+rm
+rm one two
+rm /missing
+rm /docs
+rmdir
+rmdir one two
+rmdir /missing
+rmdir /docs/course/python/readme.txt
+rmdir /
+rmdir /docs
+cd /empty
+rmdir .
+cd /
+rmdir /empty
+ls
+rm /docs/course/python/readme.txt
+ls /docs/course/python
+du /
+rmdir /docs/course/python
+rmdir /docs/course
+rmdir /docs
+ls
+history
+exit
