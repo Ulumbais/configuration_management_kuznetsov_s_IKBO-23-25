@@ -195,3 +195,5 @@ python -m unittest discover -s tests -v
 python -m src.main --vfs examples/deep.csv --script examples/stage5.txt
 python -m unittest discover -s tests -v
 ```
+
+[Документация в PDF](https://github.com/Ulumbais/configuration_management_kuznetsov_s_IKBO-23-25/releases/download/v1.0.0/README.pdf)
