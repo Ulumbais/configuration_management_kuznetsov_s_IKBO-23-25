@@ -1,0 +1,12 @@
+ls
+ls docs
+cd
+cd docs
+unknown
+ls one two
+cd one two
+exit extra
+vfs-init extra
+vfs-init
+ls
+exit

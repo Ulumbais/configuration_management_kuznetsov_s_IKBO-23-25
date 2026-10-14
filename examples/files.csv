@@ -1,0 +1,5 @@
+path,type,data
+/,dir,
+/hello.txt,file,SGVsbG8=
+/empty.txt,file,
+/binary.bin,file,AAEC

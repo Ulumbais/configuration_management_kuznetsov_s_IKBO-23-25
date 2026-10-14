@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 commands.csv
 events.csv
+working_vfs.csv
+reset_demo.csv
