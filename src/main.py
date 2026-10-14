@@ -1,7 +1,6 @@
 import csv
 import getpass
 from datetime import datetime
-"""Добавляем библиотеки для работы с файлами"""
 from pathlib import Path
 import argparse
 from src.vfs import load_vfs, reset_vfs
@@ -74,9 +73,10 @@ def execute_command(line, log_path, state):
         return True
 
     state["history"].append(line)
-    log_command(log_path, line)
-
+    
     try:
+        log_command(log_path, line)
+
         if cmd == "exit":
             if arg:
                 raise ValueError("exit не принимает аргументы")
@@ -106,7 +106,7 @@ def run_script(script_path, vfs_name, log_path, state):
         ) as file:
             for line in file:
                 line = line.strip()
-                print(f"{vfs_name}:/> {line}")
+                print(f"{vfs_name}:{state['cwd']}> {line}")
                 if not execute_command(line, log_path, state):
                     return False
     except OSError as error:
