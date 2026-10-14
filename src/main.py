@@ -6,6 +6,20 @@ from pathlib import Path
 import argparse
 from src.vfs import load_vfs, reset_vfs
 
+from src.commands import (
+    command_cd,
+    command_du,
+    command_history,
+    command_ls,
+)
+
+COMMANDS = {
+    "ls": command_ls,
+    "cd": command_cd,
+    "history": command_history,
+    "du": command_du,
+}
+
 def parse_command(text):
     """Разделяет строчку на команду и список аргументов"""
     text = text.split()
@@ -55,34 +69,28 @@ def execute_command(line, log_path, state):
     if cmd is None:
         return True
 
+    state["history"].append(line)
     log_command(log_path, line)
 
-    if cmd == "exit":
-        if arg:
-            print("Ошибка: exit не принимает аргументы")
-        else:
+    try:
+        if cmd == "exit":
+            if arg:
+                raise ValueError("exit не принимает аргументы")
             return False
 
-    elif cmd == "vfs-init":
-        if arg:
-            print("Ошибка: vfs-init не принимает аргументы")
+        if cmd == "vfs-init":
+            if arg:
+                raise ValueError("vfs-init не принимает аргументы")
+            nodes = reset_vfs(state["vfs_path"])
+            state["nodes"] = nodes
+            state["cwd"] = "/"
+            print("VFS сброшена: осталась корневая папка")
+        elif cmd in COMMANDS:
+            COMMANDS[cmd](arg, state)
         else:
-            try:
-                nodes = reset_vfs(state["vfs_path"])
-            except OSError as error:
-                print(f"Ошибка сброса VFS: {error}")
-            else:
-                state["nodes"] = nodes
-                state["cwd"] = "/"
-                print("VFS сброшена: осталась корневая папка")
-    
-    elif cmd in ["ls", "cd"]:
-        if len(arg) <= 1:
-            print(cmd, arg)
-        else:
-            print("Ошибка: слишком много аргументов")
-    else:
-        print("Ошибка: неизвестная команда")
+            raise ValueError(f"Неизвестная команда: {cmd}")
+    except (ValueError, OSError) as error:
+        print(f"Ошибка: {error}")
 
     return True
 
@@ -121,6 +129,7 @@ def main():
         "vfs_path": args.vfs,
         "nodes": nodes,
         "cwd": "/",
+        "history": [],
     }
     print(f"Загружено элементов VFS: {len(nodes)}")
 

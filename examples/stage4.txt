@@ -1,0 +1,27 @@
+ls
+ls /docs
+ls /docs/course/python/readme.txt
+ls /empty
+ls /missing
+ls one two
+cd docs/course/python
+ls .
+cd ..
+cd /docs
+cd .
+cd missing
+cd /docs/course/python/readme.txt
+cd one two
+cd
+cd ..
+du
+du /docs
+du /docs/course/python/readme.txt
+du /empty
+du missing
+du one two
+history
+history extra
+unknown
+exit extra
+exit
