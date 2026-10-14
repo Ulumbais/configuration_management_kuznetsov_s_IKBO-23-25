@@ -1,0 +1,5 @@
+path,type,data
+/,dir,
+/docs,dir,
+/docs/readme.txt,file,SGVsbG8=
+/empty,dir,

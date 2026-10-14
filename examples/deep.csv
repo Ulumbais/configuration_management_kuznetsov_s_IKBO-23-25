@@ -1,0 +1,7 @@
+path,type,data
+/,dir,
+/docs,dir,
+/docs/course,dir,
+/docs/course/python,dir,
+/docs/course/python/readme.txt,file,SGVsbG8=
+/empty,dir,

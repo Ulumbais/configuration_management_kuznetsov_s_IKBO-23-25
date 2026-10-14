@@ -4,6 +4,7 @@ from datetime import datetime
 """Добавляем библиотеки для работы с файлами"""
 from pathlib import Path
 import argparse
+from src.vfs import load_vfs, reset_vfs
 
 def parse_command(text):
     """Разделяет строчку на команду и список аргументов"""
@@ -48,7 +49,7 @@ def log_command(log_path, line):
             line,
         ])
 
-def execute_command(line, log_path):
+def execute_command(line, log_path, state):
     """Выполняет команду и сообщает, нужно ли продолжать работу."""
     cmd, arg = parse_command(line)
     if cmd is None:
@@ -61,6 +62,20 @@ def execute_command(line, log_path):
             print("Ошибка: exit не принимает аргументы")
         else:
             return False
+
+    elif cmd == "vfs-init":
+        if arg:
+            print("Ошибка: vfs-init не принимает аргументы")
+        else:
+            try:
+                nodes = reset_vfs(state["vfs_path"])
+            except OSError as error:
+                print(f"Ошибка сброса VFS: {error}")
+            else:
+                state["nodes"] = nodes
+                state["cwd"] = "/"
+                print("VFS сброшена: осталась корневая папка")
+    
     elif cmd in ["ls", "cd"]:
         if len(arg) <= 1:
             print(cmd, arg)
@@ -71,7 +86,7 @@ def execute_command(line, log_path):
 
     return True
 
-def run_script(script_path, vfs_name, log_path):
+def run_script(script_path, vfs_name, log_path, state):
     """Выполняет стартовый скрипт, отображая команды и результаты."""
     try:
         with Path(script_path).open(
@@ -80,7 +95,7 @@ def run_script(script_path, vfs_name, log_path):
             for line in file:
                 line = line.strip()
                 print(f"{vfs_name}:/> {line}")
-                if not execute_command(line, log_path):
+                if not execute_command(line, log_path, state):
                     return False
     except OSError as error:
         print(f"Ошибка чтения скрипта: {error}")
@@ -88,7 +103,7 @@ def run_script(script_path, vfs_name, log_path):
     return True
 
 def main():
-    """Запускает стартовый скрипт и интерактивный диалог."""
+    """Загружает VFS, запускает скрипт и интерактивный диалог."""
     args = parse_args()
     vfs_name = Path(args.vfs).stem
 
@@ -96,18 +111,31 @@ def main():
     print(f"Лог: {args.log}")
     print(f"Стартовый скрипт: {args.script}")
 
+    try:
+        nodes = load_vfs(args.vfs)
+    except (OSError, ValueError, csv.Error) as error:
+        print(f"Ошибка загрузки VFS: {error}")
+        return
+
+    state = {
+        "vfs_path": args.vfs,
+        "nodes": nodes,
+        "cwd": "/",
+    }
+    print(f"Загружено элементов VFS: {len(nodes)}")
+
     if args.script:
-        if not run_script(args.script, vfs_name, args.log):
+        if not run_script(args.script, vfs_name, args.log, state):
             return
 
     while True:
         try:
-            line = input(f"{vfs_name}:/> ")
+            line = input(f"{vfs_name}:{state['cwd']}> ")
         except (EOFError, KeyboardInterrupt):
             print()
             break
 
-        if not execute_command(line, args.log):
+        if not execute_command(line, args.log, state):
             break
 
             
