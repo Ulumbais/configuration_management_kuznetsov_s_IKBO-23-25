@@ -1,5 +1,9 @@
 from pathlib import PurePosixPath
 
+def require_directory(nodes, path):
+    """Проверяет, что путь существует и является папкой."""
+    if path not in nodes or nodes[path] is not None:
+        raise ValueError(f"Не является папкой: {path}")
 
 def resolve_path(state, text):
     """Находит виртуальный путь, проверяя папки по пути."""
@@ -11,8 +15,7 @@ def resolve_path(state, text):
 
     for part in text.split("/"):
         current = "/" + "/".join(parts)
-        if current not in nodes or nodes[current] is not None:
-            raise ValueError(f"Не является папкой: {current}")
+        require_directory(nodes, current)
 
         if part in ("", "."):
             continue
