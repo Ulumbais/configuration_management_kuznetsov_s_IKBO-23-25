@@ -1,3 +1,5 @@
+MAX_COMMANDS_ARGS = 1
+
 def parse_command(text):
     """Разделяет строчку на команду и список аргументов"""
     text = text.split()
@@ -21,7 +23,7 @@ def main():
             else:
                 break
         elif cmd in ['ls', 'cd']:
-            if len(arg) < 2:
+            if len(arg) <= MAX_COMMANDS_ARGS:
                 print(cmd, arg)
             else:
                 print("Ошибка: слишком много аргументов")
