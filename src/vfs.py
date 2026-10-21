@@ -17,6 +17,35 @@ def validate_tree(nodes):
             raise ValueError(f"Нет родительской папки: {parent}")
 
 
+def validate_path(path, nodes):
+    """Проверяет формат и уникальность виртуального пути."""
+    if not path or not path.startswith("/"):
+        raise ValueError("Путь должен начинаться с /")
+
+    parts = path.split("/")
+    if ".." in parts or "." in parts:
+        raise ValueError("В CSV запрещены части . и ..")
+
+    if str(PurePosixPath(path)) != path:
+        raise ValueError(f"Некорректный путь: {path}")
+
+    if path in nodes:
+        raise ValueError(f"Повтор пути: {path}")
+
+
+def decode_node(row):
+    """Возвращает None для папки или байты для файла."""
+    if row["type"] == "dir":
+        if row["data"]:
+            raise ValueError("У папки не должно быть данных")
+        return None
+
+    if row["type"] == "file":
+        return base64.b64decode(row["data"], validate=True)
+
+    raise ValueError(f"Неизвестный тип: {row['type']}")
+
+
 def load_vfs(vfs_path):
     """Загружает папки и файлы из CSV в память."""
     nodes = {}
@@ -29,29 +58,18 @@ def load_vfs(vfs_path):
             raise ValueError("Ожидаются столбцы path,type,data")
 
         for row in reader:
-            path = row["path"]
-            if not path or not path.startswith("/"):
-                raise ValueError("Путь должен начинаться с /")
-            if ".." in path.split("/") or "." in path.split("/"):
-                raise ValueError("В CSV запрещены части . и ..")
-            if str(PurePosixPath(path)) != path:
-                raise ValueError(f"Некорректный путь: {path}")
-            if path in nodes:
-                raise ValueError(f"Повтор пути: {path}")
-
-            if row["type"] == "dir":
-                if row["data"]:
-                    raise ValueError("У папки не должно быть данных")
-                nodes[path] = None
-            elif row["type"] == "file":
-                nodes[path] = base64.b64decode(
-                    row["data"], validate=True
+            if None in row or None in row.values():
+                raise ValueError(
+                    "Каждая строка CSV должна содержать три поля"
                 )
-            else:
-                raise ValueError(f"Неизвестный тип: {row['type']}")
+
+            path = row["path"]
+            validate_path(path, nodes)
+            nodes[path] = decode_node(row)
 
     validate_tree(nodes)
     return nodes
+
 
 def reset_vfs(vfs_path):
     """Записывает пустую VFS на диск и возвращает её в памяти."""

@@ -1,7 +1,6 @@
 import csv
 import getpass
 from datetime import datetime
-"""Добавляем библиотеки для работы с файлами"""
 from pathlib import Path
 import argparse
 from src.vfs import load_vfs, reset_vfs
